@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Planet Tracker</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- bower:css -->
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css" />
+    <!-- endbower -->
+
+    <!-- bower:js -->
+    <script src="/lib/jquery/dist/jquery.js"></script>
+    <script src="/lib/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="/lib/fulltilt/dist/fulltilt.js"></script>
+    <script src="/lib/gyronorm/dist/gyronorm.js"></script>
+    <script src="/lib/requirejs/require.js"></script>
+    <!-- endbower -->
+
+    <!-- inject:css -->   
+    <link rel="stylesheet" href="/css/landing-page.css">   
+    <!-- endinject -->
+
+    <!-- inject:js -->
+    <script src="/js/preview.js"></script>
+    <!-- endinject -->
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+            var interval;
+            console.log("Document ready");
+            $("#getLocation").click(function() {
+
+                $("#getLocation").text("Getting Location...");
+
+                if(navigator == undefined) {
+                    alert("Your browser doesn't support navigation APIs!!");
+                    $("#getLocation").text("Get Current Location");
+                    return;
+                }
+                navigator.geolocation.getCurrentPosition(function(pos) {
+                    var lat = pos.coords.latitude + '';
+                    var lon = pos.coords.longitude + '';
+
+                    $("#lat").text(lat.split(".")[0] + "." + lat.split(".")[1].substring(0,7));
+                    $("#lon").text(lon.split(".")[0] + "." + lon.split(".")[1].substring(0,7));
+
+                    console.log("Lat: " + lat + " Lon: " + lon);
+                    $("#getLocation").text("Get Current Location");
+                })
+            })
+
+            $("#getOrientation").click(function() {
+
+                $("#getOrientation").text("Capturing Orientation...");
+
+                var args = {
+                    frequency:50,					// ( How often the object sends the values - milliseconds )
+                    gravityNormalized:true,			// ( If the garvity related values to be normalized )
+                    orientationBase:GyroNorm.WORLD,		// ( Can be GyroNorm.GAME or GyroNorm.WORLD. gn.GAME returns orientation values with respect to the head direction of the device. gn.WORLD returns the orientation values with respect to the actual north direction of the world. )
+                    decimalCount:0,					// ( How many digits after the decimal point will there be in the return values )
+                    logger:null,					// ( Function to be called to log messages from gyronorm.js )
+                    screenAdjusted:false			// ( If set to true it will return screen adjusted values. )
+                };
+
+                //var GyroNorm = require('gyronorm').GyroNorm;
+                var gn = new GyroNorm();
+
+                gn.init(args).then(function() {
+                gn.start(function(data) {
+
+                    // Process:
+                    $("#do-alpha").text(data.do.alpha); //	( deviceorientation event alpha value )
+                    $("#do-beta").text(data.do.beta); //	( deviceorientation event beta value )
+                    $("#do-gamma").text(data.do.gamma); //	( deviceorientation event gamma value )
+                    $("#do-abs").text(data.do.absolute); //	( deviceorientation event absolute value )
+
+                    // data.dm.x		( devicemotion event acceleration x value )
+                    // data.dm.y		( devicemotion event acceleration y value )
+                    // data.dm.z		( devicemotion event acceleration z value )
+
+                    $("#dm-x").text(data.dm.gx); //	( devicemotion event accelerationIncludingGravity x value )
+                    $("#dm-y").text(data.dm.gy); //	( devicemotion event accelerationIncludingGravity y value )
+                    $("#dm-z").text(data.dm.gz); //	( devicemotion event accelerationIncludingGravity z value )
+
+                    // data.dm.alpha	( devicemotion event rotationRate alpha value )
+                    // data.dm.beta		( devicemotion event rotationRate beta value )
+                    // data.dm.gamma	( devicemotion event rotationRate gamma value )
+
+                    $("#getOrientation").text("Capture Orientation");
+                });
+                }).catch(function(e){
+                    console.log("Error " + e);
+                    $("#getOrientation").text("Capture Orientation");
+                })
+            })
+
+
+            $("#btnTracking").click(function() {
+                if($("#btnTracking").text() === 'Start Tracking') {
+                    //validate fields
+                    if($("#lat").text() === "" || $("#lon").text() === "") {
+                        alert("Latitude or Longitude cannot be empty\nPlease Get Current Location and try again");
+                        return;
+                    }
+                    else if($("#do-alpha").text().trim() === ""){ //} || ($("#do-alpha").text().trim() == 0 && $("#do-beta").text().trim() == 0)) {
+                        alert("Alpha & Beta cannot be null or 0\nPlease start capturing orientation and try again");
+                        return;
+                    }
+
+                    $("#btnTracking").text("Stop Tracking");
+                    $("#btnTracking").removeClass("btn-start");
+                    $("#btnTracking").addClass("btn-stop");
+
+                    interval = setInterval(function() {
+                        console.log("Posting data..");
+
+                        var lat = $("#lat").text();
+                        var lon = $("#lon").text();
+                        var alpha = $("#do-alpha").text();
+                        var beta = $("#do-beta").text();
+                        var celestialObj = $("#object").text().trim();
+
+
+                    }, 200);
+                }
+                else {
+
+                    clearInterval(interval);
+
+                    $("#btnTracking").text("Start Tracking");
+                    $("#btnTracking").removeClass("btn-stop");
+                    $("#btnTracking").addClass("btn-start");
+                }    
+            })
+
+            $(".dropdown-menu li a").click(function(){
+                $(this).parents(".dropdown").find('.btn').html($(this).text() + ' <span class="caret"></span>');
+                $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
+            });
+        });
+        
+    </script>
+
+
+
+</head>
+
+<body class="container">
+    <div>
+        <div class="row center-block"  style="margin-bottom: 20px; margin-top: 20px; max-width: 400px;">
+            <div class="col-xs-3">
+                <img src="../../../img/icons/sat.png"/ height="42" width="80">
+            </div>
+            <div class="col-xs-8" style="height: 42px; text-align: left">
+                <span style="font-size: 20pt;">Planet Tracker</span>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 20px">
+            <a id="getLocation" href="#" class="btn btn-get btn-md center-block">
+                Get Current Location
+            </a>   
+        </div>
+        <div class="row" style="height: 10px;"/>
+        <div class="row" style="margin-left: 15px; margin-right: 15px;"> 
+            <div class="col-sm-4" style="margin-top: 10px">
+                <span>Latitude:</span>
+                <span id="lat"></span>
+            </div>
+            <div class="col-sm-4" style="margin-top: 10px">
+                <span>Longitude:</span>
+                <span id="lon"></span>
+            </div>
+        </div>
+        
+        <div class="row center-block" style="margin-top: 20px; padding-left: 15px; padding-right: 15px">
+            <a id="getOrientation" href="#" class="btn btn-get btn-md center-block">
+                Capture Orientation
+            </a>
+        </div>
+        <div class="row center-block" style="margin-left: 20px; margin-right: 15px; max-width: 400px;">
+            <div class="col-xs-6" style="margin-top: 15px">
+                <div class="row" style="margin-bottom: 10px">
+                    <span>Device Orientation</span>
+                </div>
+                <div class="row">
+                    <span>Alpha:</span>
+                    <span id="do-alpha"></span>
+                </div>
+                <div class="row">
+                    <span>Beta:</span>
+                    <span id="do-beta"></span>
+                </div>
+                <div class="row">
+                    <span>Gamma:</span>
+                    <span id="do-gamma"></span>
+                </div>
+                <div class="row">
+                    <span>Absolute:</span>
+                    <span id="do-abs"></span>
+                </div>
+            </div>
+
+            <div class="col-xs-6" style="margin-top: 15px">
+                <div class="row" style="margin-bottom: 10px">
+                    <span>Device Motion</span>
+                </div>
+                <div class="row">
+                    <span>gX:</span>
+                    <span id="dm-x"></span>
+                </div>
+                <div class="row">
+                    <span>gY:</span>
+                    <span id="dm-y"></span>
+                </div>
+                <div class="row">
+                    <span>gZ:</span>
+                    <span id="dm-z"></span>
+                </div>
+            </div>
+        </div>  
+        
+        <div class="row center-block" style="margin-top: 20px; padding-left: 15px; padding-right: 15px; max-width: 400px;">
+            <div class="col-xs-6" style="margin-top: 15px">
+                <div class="dropdown">
+                    <button id="object" class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" style="width: 170px">Select Object to track
+                    <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Select Object to track</a><li>
+                        <li class="divider"></li>
+                        <li><a href="#">Sun</a><li>
+                        <li><a href="#">Moon</a><li>
+                        <li><a href="#">Mercury</a><li>
+                        <li><a href="#">Venus</a><li>
+                        <li><a href="#">Mars</a><li>
+                        <li><a href="#">Jupiter</a><li>
+                        <li><a href="#">Saturn</a><li>
+                        <li><a href="#">Uranus</a><li>
+                        <li><a href="#">Neptune</a><li>
+                        <li><a href="#">Pluto</a><li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-xs-6" style="margin-top: 15px">
+                <a id="btnTracking" href="#" class="btn btn-start btn-md center-block" style="width: 160px">Start Tracking</a>
+            </div>
+            
+        </div>              
+    </div>
+</body>
+</html>
