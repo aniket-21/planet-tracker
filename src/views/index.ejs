@@ -114,6 +114,8 @@
                     $("#btnTracking").removeClass("btn-start");
                     $("#btnTracking").addClass("btn-stop");
 
+                    var resetFlag = true;
+
                     interval = setInterval(function() {
                         console.log("Posting data..");
 
@@ -123,13 +125,22 @@
                         var beta = $("#do-beta").text();
                         var celestialObj = $("#object").text().trim();
 
+                        $.post("align", {
+                            lat: lat,
+                            lon: lon,
+                            alpha: alpha,
+                            beta: beta,
+                            obj: celestialObj,
+                            reset: resetFlag
+                        });
 
+                        resetFlag = false;
                     }, 200);
                 }
                 else {
 
                     clearInterval(interval);
-
+                    deleteAllCookies();
                     $("#btnTracking").text("Start Tracking");
                     $("#btnTracking").removeClass("btn-stop");
                     $("#btnTracking").addClass("btn-start");
@@ -140,6 +151,17 @@
                 $(this).parents(".dropdown").find('.btn').html($(this).text() + ' <span class="caret"></span>');
                 $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
             });
+
+            function deleteAllCookies() {
+                var cookies = document.cookie.split(";");
+
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i];
+                    var eqPos = cookie.indexOf("=");
+                    var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+                    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+                }
+            }
         });
         
     </script>
@@ -159,28 +181,27 @@
             </div>
         </div>
         <div class="row" style="margin-top: 20px">
-            <a id="getLocation" href="#" class="btn btn-get btn-md center-block">
+            <a id="getLocation" href="#" class="btn btn-get btn-md center-block" style="max-width: 320px">
                 Get Current Location
             </a>   
         </div>
         <div class="row" style="height: 10px;"/>
-        <div class="row" style="margin-left: 15px; margin-right: 15px;"> 
-            <div class="col-sm-4" style="margin-top: 10px">
-                <span>Latitude:</span>
+        <div class="row center-block" style="padding-left: 15px; padding-right: 15px; max-width: 400px;"> 
+            <div class="col-xs-6" style="margin-top: 10px" align="center">
+                <span>Lat:</span>
                 <span id="lat"></span>
             </div>
-            <div class="col-sm-4" style="margin-top: 10px">
-                <span>Longitude:</span>
+            <div class="col-xs-6" style="margin-top: 10px" align="center">
+                <span>Lon:</span>
                 <span id="lon"></span>
             </div>
         </div>
-        
         <div class="row center-block" style="margin-top: 20px; padding-left: 15px; padding-right: 15px">
-            <a id="getOrientation" href="#" class="btn btn-get btn-md center-block">
+            <a id="getOrientation" href="#" class="btn btn-get btn-md center-block" style="max-width: 320px">
                 Capture Orientation
             </a>
         </div>
-        <div class="row center-block" style="margin-left: 20px; margin-right: 15px; max-width: 400px;">
+        <div class="row center-block" style="max-width: 400px;">
             <div class="col-xs-6" style="margin-top: 15px">
                 <div class="row" style="margin-bottom: 10px">
                     <span>Device Orientation</span>
@@ -225,7 +246,7 @@
         <div class="row center-block" style="margin-top: 20px; padding-left: 15px; padding-right: 15px; max-width: 400px;">
             <div class="col-xs-6" style="margin-top: 15px">
                 <div class="dropdown">
-                    <button id="object" class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" style="width: 170px">Select Object to track
+                    <button id="object" class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" style="width: 155px; text-align: center">Select Object
                     <span class="caret"></span></button>
                     <ul class="dropdown-menu">
                         <li><a href="#">Select Object to track</a><li>
@@ -244,7 +265,7 @@
                 </div>
             </div>
             <div class="col-xs-6" style="margin-top: 15px">
-                <a id="btnTracking" href="#" class="btn btn-start btn-md center-block" style="width: 160px">Start Tracking</a>
+                <a id="btnTracking" href="#" class="btn btn-start btn-md center-block" style="width: 155px">Start Tracking</a>
             </div>
             
         </div>              
