@@ -105,8 +105,12 @@
                         alert("Latitude or Longitude cannot be empty\nPlease Get Current Location and try again");
                         return;
                     }
-                    else if($("#do-alpha").text().trim() === ""){ //} || ($("#do-alpha").text().trim() == 0 && $("#do-beta").text().trim() == 0)) {
+                    else if($("#do-alpha").text().trim() === "") { //} || ($("#do-alpha").text().trim() == 0 && $("#do-beta").text().trim() == 0)) {
                         alert("Alpha & Beta cannot be null or 0\nPlease start capturing orientation and try again");
+                        return;
+                    }
+                    else if($("#object").text().trim() === "Select Object") {
+                        alert("Please select an Object to track")
                         return;
                     }
 
@@ -249,7 +253,7 @@
                     <button id="object" class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" style="width: 155px; text-align: center">Select Object
                     <span class="caret"></span></button>
                     <ul class="dropdown-menu">
-                        <li><a href="#">Select Object to track</a><li>
+                        <li><a href="#">Select Object</a><li>
                         <li class="divider"></li>
                         <li><a href="#">Sun</a><li>
                         <li><a href="#">Moon</a><li>

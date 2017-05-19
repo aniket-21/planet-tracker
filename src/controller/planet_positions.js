@@ -1,7 +1,16 @@
 "use strict"
 
 var celestialBodies = {
-    Moon: 10
+    Moon: 10,
+    Mercury: 1,
+    Venus: 2,
+    Mars: 4,
+    Jupiters: 5,
+    Saturn: 6,
+    Uranus: 7,
+    Neptune: 8,
+    Pluto: 9,
+    Sun: 0
 }
 
 module.exports = function(planet, latInDegrees, lonInDegrees, callback) {
@@ -22,7 +31,7 @@ module.exports = function(planet, latInDegrees, lonInDegrees, callback) {
     request.post({
         url: baseUrlJapanObservatory, 
         form: {
-            body: celestialBodies.Moon,
+            body: celestialBodies[planet],
             year: y,
             month: m,
             day: d,

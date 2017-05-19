@@ -4,13 +4,10 @@ var express = require('express');
 var alignRouter = express.Router();
 
 var pp = require('../controller/planet_positions.js');
-//var pp = new PlanetPositions();
 
 module.exports = function () {
-
     alignRouter.route('/')
 		.post(function(req, res) {
-			
             //check for resetFlag
             if(req.body.reset === "true") {
                 var obj = req.body.obj;
@@ -40,7 +37,6 @@ module.exports = function () {
                 res.set(200);
                 res.end();
             }
-			
 		});
 
     return alignRouter;
