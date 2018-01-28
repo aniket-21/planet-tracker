@@ -100,6 +100,9 @@
 
             $("#btnTracking").click(function() {
                 if($("#btnTracking").text() === 'Start Tracking') {
+                    //clear error
+                    $("#error").text("");
+                    
                     //validate fields
                     if($("#lat").text() === "" || $("#lon").text() === "") {
                         alert("Latitude or Longitude cannot be empty\nPlease Get Current Location and try again");
@@ -118,33 +121,25 @@
                     $("#btnTracking").removeClass("btn-start");
                     $("#btnTracking").addClass("btn-stop");
 
-                    var resetFlag = true;
+                    console.log("Posting data..");
 
-                    interval = setInterval(function() {
-                        console.log("Posting data..");
+                    var lat = $("#lat").text();
+                    var lon = $("#lon").text();
+                    var alpha = $("#do-alpha").text();
+                    var beta = $("#do-beta").text();
+                    var celestialObj = $("#object").text().trim();
 
-                        var lat = $("#lat").text();
-                        var lon = $("#lon").text();
-                        var alpha = $("#do-alpha").text();
-                        var beta = $("#do-beta").text();
-                        var celestialObj = $("#object").text().trim();
-
-                        $.post("align", {
-                            lat: lat,
-                            lon: lon,
-                            alpha: alpha,
-                            beta: beta,
-                            obj: celestialObj,
-                            reset: resetFlag
-                        });
-
-                        resetFlag = false;
-                    }, 200);
+                    $.post("align", {
+                        lat: lat,
+                        lon: lon,
+                        alpha: alpha,
+                        beta: beta,
+                        obj: celestialObj
+                    }, function(res, status) {
+                        $("#error").text(res);
+                    });
                 }
                 else {
-
-                    clearInterval(interval);
-                    deleteAllCookies();
                     $("#btnTracking").text("Start Tracking");
                     $("#btnTracking").removeClass("btn-stop");
                     $("#btnTracking").addClass("btn-start");
@@ -271,8 +266,9 @@
             <div class="col-xs-6" style="margin-top: 15px">
                 <a id="btnTracking" href="#" class="btn btn-start btn-md center-block" style="width: 155px">Start Tracking</a>
             </div>
-            
-        </div>              
+        </div>   
+        
+        <div id=error class="row center-block" style="margin-top: 20px; padding-left: 15px; padding-right: 15px; max-width: 400px; color:red"></div>
     </div>
 </body>
 </html>

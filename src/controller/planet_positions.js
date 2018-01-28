@@ -59,6 +59,7 @@ module.exports = function(planet, latInDegrees, lonInDegrees, callback) {
             //Check for Error
             if(error != undefined) {
                 console.log("Error occured while fetching planetary details from Japan");
+                callback(-1, -1);
                 return;
             }
 
@@ -71,8 +72,8 @@ module.exports = function(planet, latInDegrees, lonInDegrees, callback) {
                 callback(text[9], text[8]);
             }
             catch(e) {
-                console.error("Error occured while fetching data from Japan Observatory website");
-                callback(0,0);
+                console.error("Error " + e + " occured ");
+                callback(-1, -1);
             }
         }
     )
